@@ -301,23 +301,23 @@ class Storage(storage.Storage):
                        SELECT a.id, a.name, a.deleted, coalesce(b.name, ?) as category
                          FROM activities a
                     LEFT JOIN categories b ON category_id = b.id
-                        WHERE lower(a.name) = lower(?)
+                        WHERE a.search_name = ?
                           AND category_id = ?
                      ORDER BY a.deleted, a.id desc
                         LIMIT 1
             """
 
-            res = self.fetchone(query, (self._unsorted_localized, name, category_id))
+            res = self.fetchone(query, (self._unsorted_localized, name.lower(), category_id))
         else:
             query = """
                        SELECT a.id, a.name, a.deleted, coalesce(b.name, ?) as category
                          FROM activities a
                     LEFT JOIN categories b ON category_id = b.id
-                        WHERE lower(a.name) = lower(?)
+                        WHERE a.search_name = ?
                      ORDER BY a.deleted, a.id desc
                         LIMIT 1
             """
-            res = self.fetchone(query, (self._unsorted_localized, name, ))
+            res = self.fetchone(query, (self._unsorted_localized, name.lower(), ))
 
         if res:
             keys = ('id', 'name', 'deleted', 'category')
